@@ -35,13 +35,15 @@ public:
 
     Motor():S_max_aups(1),A_aupss(1),P(0),V(0){}
 
-    float S_max_aups;//max V
-    float A_aupss;//a
+    float S_max_aups;//max speed
+    float A_aupss;//fixed absolute value acceleration( > 0), in real process  acceleration can be -A_aupss,+A_aupss or 0
+    float A; //current acceleration
     int TP;
     int P;
     float V;
 
     void step(float dt);
+    void calculate();
 };
 
 class Pen
@@ -97,5 +99,20 @@ private:
 
 
 };
+
+//a- abs value
+namespace TRAEKT
+{
+enum SpeedChange
+{
+    INCREASE,
+    DECREASE,
+    NOCHANGE,
+    ERROR
+};
+
+SpeedChange nextSpeedChange(float V0, float x0, float a, float Vmax, float xT);
+
+}
 
 #endif // PLOTTER_H

@@ -84,10 +84,10 @@ void initScen()
     s = "set motor m1 S=10";
     que.push(std::move(s));
 
-    s = "set motor m1 A=2";
+    s = "set motor m1 A=1";
     que.push(std::move(s));
 
-    s = "set motor m1 P=2";
+    s = "set motor m1 P=100";
     que.push(std::move(s));
 
     s = "start";
@@ -329,10 +329,32 @@ void Motor::step(float dt)
 {
 
     P = P + V*dt;
-    V = min(V + A_aupss*dt,S_max_aups);
+    V = min(V + A*dt, S_max_aups);
+    calculate();
+
 }
 
+void Motor::calculate()
+{
+   using namespace TRAEKT;
 
+  SpeedChange change =
+          nextSpeedChange(V, P, A_aupss, S_max_aups, TP);
+
+  switch(change)
+  {
+  case INCREASE :
+      A = abs(A_aupss);
+      break;
+  case DECREASE :
+      A = -abs(A_aupss);
+      break;
+  case NOCHANGE:
+      A = 0;
+      break;
+  default: break;
+  }
+}
 
 Pen::Pen():xM(nullptr),yM(nullptr)
 {
@@ -377,6 +399,55 @@ void Pen::setMotorY(Motor* motPtr)
 {
     if(motPtr!= nullptr)
      yM = motPtr;
+}
+
+
+
+TRAEKT::SpeedChange TRAEKT::nextSpeedChange(float Vc, float x0, float a, float Vm, float xT)
+{
+    using namespace TRAEKT;
+
+    if(xT == x0 && Vc == 0)
+            return NOCHANGE;
+
+    //float xDown = Vm*Vm/(2*a)+1;// s down from Vmax to 0
+
+    float xDown = Vm*(Vm+1)/(2.0*a) +1;// s down from Vmax to 0
+
+    if(xT - x0 > xDown)
+    {
+        if(Vc < Vm)
+            return INCREASE;
+        if(Vc == Vm)
+            return NOCHANGE;
+    }
+    if(xT - x0 <= xDown)
+    {
+        //float Vm2 = sqrt(2*a*(xT - x0))-1; //Vmax for possible down V to 0
+
+//        float Vm2 = 2*(xT - x0)-1;
+//        if(Vc < Vm2)
+//            return INCREASE;
+//        //if(Vc == Vm2)
+//          //  return NOCHANGE;
+//        if(Vc >= Vm2)
+//           return DECREASE;
+
+        if(xT - x0 > 0 && Vc > 0)
+        {
+            return DECREASE;
+        }
+
+        if(xT - x0 > 0 && Vc <= 0)
+        {
+            return INCREASE;
+        }
+
+
+    }
+
+
+    return ERROR;
 }
 
 
