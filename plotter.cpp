@@ -14,8 +14,6 @@
 using namespace std;
 
 
-
-
 void Reader()
 {
     while (std::cin) {
@@ -90,6 +88,9 @@ void initScen()
     s = "set motor m1 P=100";
     que.push(std::move(s));
 
+    s = "set sim dT=1";
+    que.push(std::move(s));
+
     s = "start";
     que.push(std::move(s));
 
@@ -103,15 +104,13 @@ void initBaseLog()
     logMap.insert(make_pair("base",queue<string>()));
 }
 
-Plotter::Plotter(): state(CONF)
+Plotter::Plotter(): state(CONF),dtSim(1),dtLog(1)
 {
 
 }
 
 void Plotter::theadStart()
 {
-
-
     initScen();//!!!
 
     std::thread t1(&Plotter::run, this);
@@ -133,7 +132,7 @@ void Plotter:: run()
   initBaseLog();
   while(1)
   {
-   std::this_thread::sleep_for(std::chrono::seconds(1));
+   std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(dtSim*1000)));
 
    queue<string> &cmdQue = THREADS_QUEUE::getCmdQueue();
    //&cmdQue = que_glob;
@@ -236,10 +235,11 @@ void Plotter::processCmd(string str)
 
            if(s =="dT")
            {
+               string paramValueStr = v.at(2).substr((v.at(2).find("="))+1);
                if(v.at(1)=="sim")
-                dtSim = stof(v.at(2));
+                dtSim = stof(paramValueStr);
                else if(v.at(1)=="log")
-                dtLog = stof(v.at(2));
+                dtLog = stof(paramValueStr);
            }
 
            return;
@@ -304,7 +304,7 @@ void Plotter:: sims()
 
       for(pair<string,Pen> pair : penMap)
       {
-          pair.second.step(1);
+          pair.second.step(dtSim);
 
 
           string logStr = pair.second.getLogString();
@@ -316,7 +316,7 @@ void Plotter:: sims()
           logMap.at(pair.first).push(move(logStr));
       }
 
-    time+=1;
+    time+=dtSim;
 }
 
 void Plotter:: end()
@@ -324,6 +324,14 @@ void Plotter:: end()
   cout<<"end";
 }
 
+
+Motor::Motor():S_max_aups(1),
+               A_aupss(1),
+               P(0),
+               V(0)
+{
+
+}
 
 void Motor::step(float dt)
 {
@@ -410,9 +418,8 @@ TRAEKT::SpeedChange TRAEKT::nextSpeedChange(float Vc, float x0, float a, float V
     if(xT == x0 && Vc == 0)
             return NOCHANGE;
 
-    //float xDown = Vm*Vm/(2*a)+1;// s down from Vmax to 0
 
-    float xDown = Vm*(Vm+1)/(2.0*a) +1;// s down from Vmax to 0
+    float xDown = 1/2. * (Vm/a +1) * Vm ;// s down from Vmax to 0
 
     if(xT - x0 > xDown)
     {

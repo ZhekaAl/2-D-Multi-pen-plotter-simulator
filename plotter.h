@@ -12,20 +12,15 @@ using namespace std;
 
 namespace THREADS_QUEUE
 {
-
     static queue<string>& getCmdQueue(){
         static queue<string> cmdQueue;
         return cmdQueue;
     }
 
-
-
     static map<string, queue<string> >& getLogMap(){
         static map<string, queue<string> > logMap;
         return logMap;
     }
-
-
 }
 
 
@@ -33,13 +28,13 @@ class Motor
 {
 public:
 
-    Motor():S_max_aups(1),A_aupss(1),P(0),V(0){}
+    Motor();
 
     float S_max_aups;//max speed
     float A_aupss;//fixed absolute value acceleration( > 0), in real process  acceleration can be -A_aupss,+A_aupss or 0
     float A; //current acceleration
-    int TP;
-    int P;
+    float TP;
+    float P;
     float V;
 
     void step(float dt);
@@ -78,13 +73,7 @@ public:
     void theadStart();
 private:
 
-    map<string, Pen> penMap;
-    map<string, Motor> motorMap;
-    State state;
-
     void run();
-
-
 
     void conf();
     void sims();
@@ -92,12 +81,14 @@ private:
 
     void processCmd(string str);
 
-    float time;
+    map<string, Pen> penMap;
+    map<string, Motor> motorMap;
+    State state;
 
-    float dtSim;
-    float dtLog;
+    float time; // current time simulation
 
-
+    float dtSim; //stepUpdateStates
+    float dtLog; //stepToWriteLog
 };
 
 //a- abs value
