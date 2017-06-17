@@ -115,15 +115,37 @@ void Plotter::theadStart()
 
     std::thread t1(&Plotter::run, this);
     std::thread r(Reader);
+    std::thread w1(&Plotter::addLogThread,this);
     std::thread w(Writer);
 
     t1.join();
     r.join();
     w.join();
+    w1.join();
 
 }
 
+void Plotter::addLogThread()
+{
+    while(1)
+    {
+    std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(dtLog*1000)));
 
+    for(pair<string,Pen> pair : penMap)
+    {
+
+
+        string logStr = pair.second.getLogString();
+        ostringstream oss;
+        oss << time<<";"<<logStr<<"\n";
+
+        logStr = oss.str();
+        map<string, queue<string> >& logMap = THREADS_QUEUE::getLogMap();
+        logMap.at(pair.first).push(move(logStr));
+    }
+    }
+
+}
 
 void Plotter:: run()
 {
@@ -301,22 +323,11 @@ void Plotter:: conf()
 
 void Plotter:: sims()
 {
-
-      for(pair<string,Pen> pair : penMap)
-      {
-          pair.second.step(dtSim);
-
-
-          string logStr = pair.second.getLogString();
-          ostringstream oss;
-          oss << time<<";"<<logStr<<"\n";
-
-          logStr = oss.str();
-          map<string, queue<string> >& logMap = THREADS_QUEUE::getLogMap();
-          logMap.at(pair.first).push(move(logStr));
-      }
-
-    time+=dtSim;
+    for(pair<string,Pen> pair : penMap)
+    {
+        pair.second.step(dtSim);
+    }
+    time += dtSim;
 }
 
 void Plotter:: end()
