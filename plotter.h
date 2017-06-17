@@ -38,7 +38,7 @@ public:
     float V;
 
     void step(float dt);
-    void calculate();
+    void calculate(float dt);
 };
 
 class Pen
@@ -79,6 +79,8 @@ private:
     void sims();
     void end();
 
+    void addLogThread();
+
     void processCmd(string str);
 
     map<string, Pen> penMap;
@@ -102,7 +104,10 @@ enum SpeedChange
     ERROR
 };
 
-SpeedChange nextSpeedChange(float V0, float x0, float a, float Vmax, float xT);
+SpeedChange nextSpeedChange(float V0, float x0, float a, float xT, float dt);
+
+
+
 
 }
 

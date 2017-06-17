@@ -76,19 +76,68 @@ void initScen()
     s = "create motor m1";
     que.push(std::move(s));
 
+    s = "create motor m2";
+    que.push(std::move(s));
+
     s = "attach m1 with x of p1";
     que.push(std::move(s));
 
-    s = "set motor m1 S=10";
+    s = "attach m2 with y of p1";
     que.push(std::move(s));
 
-    s = "set motor m1 A=1";
+    s = "set motor m1 S=40";
     que.push(std::move(s));
 
-    s = "set motor m1 P=100";
+    s = "set motor m2 S=40";
     que.push(std::move(s));
 
-    s = "set sim dT=1";
+    s = "set motor m1 A=4";
+    que.push(std::move(s));
+
+    s = "set motor m2 A=2";
+    que.push(std::move(s));
+
+    s = "set motor m1 P=200";
+    que.push(std::move(s));
+
+    s = "set motor m2 P=120";
+    que.push(std::move(s));
+
+    s = "create pen p2";
+        que.push(std::move(s));
+
+        s = "create motor m3";
+        que.push(std::move(s));
+
+        s = "create motor m4";
+        que.push(std::move(s));
+
+        s = "attach m3 with x of p2";
+        que.push(std::move(s));
+
+        s = "attach m4 with y of p2";
+        que.push(std::move(s));
+
+        s = "set motor m3 S=20";
+        que.push(std::move(s));
+
+        s = "set motor m4 S=20";
+        que.push(std::move(s));
+
+        s = "set motor m3 A=4";
+        que.push(std::move(s));
+
+        s = "set motor m4 A=3";
+        que.push(std::move(s));
+
+        s = "set motor m3 P=300";
+        que.push(std::move(s));
+
+        s = "set motor m4 P=220";
+        que.push(std::move(s));
+
+
+    s = "set sim dT=0.1";
     que.push(std::move(s));
 
     s = "start";
@@ -278,7 +327,7 @@ void Plotter::processCmd(string str)
 
           //  float paramValue = data[0];
 
-            if(motorParam =="S")
+            if(motorParam == "S")
                 motorMap.at(motorName).S_max_aups = paramValue;
 
             else if(motorParam =="A")
@@ -349,16 +398,16 @@ void Motor::step(float dt)
 
     P = P + V*dt;
     V = min(V + A*dt, S_max_aups);
-    calculate();
+    calculate(dt);
 
 }
 
-void Motor::calculate()
+void Motor::calculate(float dt)
 {
    using namespace TRAEKT;
 
   SpeedChange change =
-          nextSpeedChange(V, P, A_aupss, S_max_aups, TP);
+          nextSpeedChange(V, P, A_aupss, TP, dt);
 
   switch(change)
   {
@@ -422,50 +471,48 @@ void Pen::setMotorY(Motor* motPtr)
 
 
 
-TRAEKT::SpeedChange TRAEKT::nextSpeedChange(float Vc, float x0, float a, float Vm, float xT)
+
+TRAEKT::SpeedChange TRAEKT::nextSpeedChange(float Vc, float x0, float a, float xT, float dt)
 {
-    using namespace TRAEKT;
+   using namespace TRAEKT;
+   SpeedChange res = ERROR;
+   if(a <= 0 || dt <= 0) return  res;
 
-    if(xT == x0 && Vc == 0)
-            return NOCHANGE;
+   float xDown = 0.5 * (Vc/(a*dt) +1) * Vc * dt ;// distance to down from current speed to 0
 
+   float ds = abs(xT - x0); //distance to target
 
-    float xDown = 1/2. * (Vm/a +1) * Vm ;// s down from Vmax to 0
+/*1 near target*/ if(ds < a*dt*dt)
+                   {
+                    if( abs(Vc) < a*dt) res = NOCHANGE;
+                    else if( Vc > 0) res = DECREASE;
+                    else if( Vc < 0) res = INCREASE;
+                   }
 
-    if(xT - x0 > xDown)
-    {
-        if(Vc < Vm)
-            return INCREASE;
-        if(Vc == Vm)
-            return NOCHANGE;
-    }
-    if(xT - x0 <= xDown)
-    {
-        //float Vm2 = sqrt(2*a*(xT - x0))-1; //Vmax for possible down V to 0
+/*2 wrong direction*/else if(x0 < xT && Vc < 0) res = INCREASE;
+                      else if(x0 > xT && Vc > 0) res = DECREASE;
 
-//        float Vm2 = 2*(xT - x0)-1;
-//        if(Vc < Vm2)
-//            return INCREASE;
-//        //if(Vc == Vm2)
-//          //  return NOCHANGE;
-//        if(Vc >= Vm2)
-//           return DECREASE;
+/*3  general       */else if(ds < xDown){
+                        if(x0 < xT) res = DECREASE;
+                        else if(x0 > xT) res = INCREASE;
+                     }
+                     else if(abs(ds - xDown) < a*dt)  res = NOCHANGE;
 
-        if(xT - x0 > 0 && Vc > 0)
-        {
-            return DECREASE;
-        }
+                     else if(ds > xDown){
+                        if(x0 < xT)  res = INCREASE;
+                        if(x0 > xT)  res = DECREASE;
+                    }
 
-        if(xT - x0 > 0 && Vc <= 0)
-        {
-            return INCREASE;
-        }
+    //------for debug trace
+        float d = a*dt; float Vcm = 0;//v max in current time, such that v can be 0, when x0=xT
+        Vcm = -d + sqrt(pow(d,2)+8*d*(xT-x0));
+        ostringstream ossLog;
+        ossLog<<"nextSpeedChange Vc="<<Vc<<" a="<<a<<" dt="<<dt<<" xt-x0="<<xT-x0<<" xDown="<<xDown<<" Vcm="<<Vcm<<" res=(0+,1-,2=)"<<res<<endl;
+        map<string, queue<string>>& mapLog = THREADS_QUEUE::getLogMap();
+        mapLog.at("base").push(ossLog.str());
+    //------end
 
-
-    }
-
-
-    return ERROR;
+    return res;
 }
 
 
