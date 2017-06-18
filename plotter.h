@@ -7,20 +7,34 @@
 #include  <string>
 #include <map>
 
+#include "threadqueue.h"
+
 using namespace std;
 
 
 namespace THREADS_QUEUE
 {
-    static queue<string>& getCmdQueue(){
-        static queue<string> cmdQueue;
+//    static queue<string>& getCmdQueue(){
+//        static queue<string> cmdQueue;
+//        return cmdQueue;
+//    }
+
+//    static map<string, queue<string> >& getLogMap(){
+//        static map<string, queue<string> > logMap;
+//        return logMap;
+//    }
+
+static ThreadQueue<string>& getCmdQueue(){
+        static ThreadQueue<string> cmdQueue;
         return cmdQueue;
     }
 
-    static map<string, queue<string> >& getLogMap(){
-        static map<string, queue<string> > logMap;
+
+    static ThreadMap<string>& getLogMap(){
+        static ThreadMap<string> logMap;
         return logMap;
     }
+
 }
 
 
@@ -69,17 +83,13 @@ class Plotter
   enum State {CONF, SIM, END};
 public:
     Plotter();
+    void runThread(); //
+    void addLogThread();
 
-    void theadStart();
 private:
-
-    void run();
-
     void conf();
     void sims();
     void end();
-
-    void addLogThread();
 
     void processCmd(string str);
 
@@ -91,6 +101,11 @@ private:
 
     float dtSim; //stepUpdateStates
     float dtLog; //stepToWriteLog
+
+    ThreadMap<string>& logMap; //reference! to shared data
+
+    condition_variable logThrWaitCond;// for wait adLog Thread, when state != SIMS
+
 };
 
 //a- abs value
@@ -106,9 +121,21 @@ enum SpeedChange
 
 SpeedChange nextSpeedChange(float V0, float x0, float a, float xT, float dt);
 
-
-
-
 }
+
+void initScen();
+
+
+void cmdReader();
+void logWriter();
+void initBaseLog();
+
+void theadStart(Plotter* plotter);
+
+
+
+
+
+
 
 #endif // PLOTTER_H

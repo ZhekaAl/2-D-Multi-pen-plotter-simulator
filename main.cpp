@@ -12,7 +12,8 @@ int main()
     cout << "Hello World!" << endl;
 
     Plotter plotter;
-    plotter.theadStart();
+    theadStart(&plotter);
+    // theadStart();
 
     return 0;
 }
