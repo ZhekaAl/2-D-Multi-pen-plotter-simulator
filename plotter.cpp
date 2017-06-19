@@ -17,13 +17,18 @@ void cmdReader()
 {
 
     ThreadQueue<string> &cmdQueue  =  THREADS_QUEUE::getCmdQueue();
+    const atomic<bool>& fin = THREADS_QUEUE::getToFisinish();
 
-    while (std::cin) {
+    while (!fin && std::cin) {
 
-        auto s = std::string();
+        string s;
         getline(cin,s);
-        cmdQueue.push(std::move(s));
+        cmdQueue.push(s);
+        if(s == "stop")
+            break;
+
     }
+    cout<<"finCmdReader;";
 }
 
 
@@ -32,8 +37,9 @@ void logWriter()
 
    ThreadMap<string>& logMap = THREADS_QUEUE::getLogMap();
    initBaseLog();
+   const atomic<bool>& fin = THREADS_QUEUE::getToFisinish();
 
-   while(1)
+   while( !fin)
       {
       const map<string, queue<string> >& logMapRead = logMap.getMapToRead();//wait while queues are empty
       map <string, queue<string> >::const_iterator  mapEl;
@@ -57,6 +63,8 @@ void logWriter()
       }
 
     }
+
+   cout<<"fin logWriter";
 
 
 }
@@ -160,6 +168,9 @@ Plotter::Plotter(): state(CONF),dtSim(1),dtLog(1),
 
 void theadStart(Plotter * plotter)
 {
+    atomic<bool>& fin = THREADS_QUEUE::getToFisinish();
+    fin = false;
+
     initScen();// imit cmd input
 
     thread t1(&Plotter::runThread,plotter);
@@ -172,6 +183,8 @@ void theadStart(Plotter * plotter)
     w1.join();
     w2.join();
 
+    cout<<"allFinished";
+
 }
 
 
@@ -181,14 +194,21 @@ void Plotter::addLogThread()
     mutex mtx;
     //condition_variable cond;
 
-    while(1)
+    const atomic<bool>& fin = THREADS_QUEUE::getToFisinish();
+    const State & s=state;
+
+    auto lfunc = [&s,&fin]{
+        bool res = (s == SIM || fin);
+        return res;
+    };
+
+    while(!fin)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(dtLog*1000)));
 
 
         unique_lock<mutex> mlock(mtx);
-        const State & s=state;
-        logThrWaitCond.wait(mlock,[&s]{return s == SIM;});
+        logThrWaitCond.wait(mlock, lfunc);
 
         for(pair<string,Pen> pair : penMap)
         {
@@ -199,12 +219,15 @@ void Plotter::addLogThread()
             logMap.push(pair.first, oss.str() );
         }
     }
+    cout<<"finish addLogTh";
 }
 
 void Plotter:: runThread()
 {
 
-  while(1)
+   atomic<bool>& fin = THREADS_QUEUE::getToFisinish();
+
+  while(!fin)
   {
    std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(dtSim*1000)));
 
@@ -225,12 +248,14 @@ void Plotter:: runThread()
        sims();
        break;
    case END:
-       end();
+       fin=true;
        break;
    default:
        return;
    }
    }
+
+  cout<<"finish RunThread";
 }
 
 
@@ -260,6 +285,7 @@ void Plotter::processCmd(string str)
     if(v.front()=="stop" && v.size() == 1)
     {
         state = END;
+
         return;
     }
 

@@ -6,6 +6,7 @@
 #include <queue>
 #include  <string>
 #include <map>
+#include <atomic>
 
 #include "threadqueue.h"
 
@@ -14,15 +15,6 @@ using namespace std;
 
 namespace THREADS_QUEUE
 {
-//    static queue<string>& getCmdQueue(){
-//        static queue<string> cmdQueue;
-//        return cmdQueue;
-//    }
-
-//    static map<string, queue<string> >& getLogMap(){
-//        static map<string, queue<string> > logMap;
-//        return logMap;
-//    }
 
 static ThreadQueue<string>& getCmdQueue(){
         static ThreadQueue<string> cmdQueue;
@@ -34,6 +26,11 @@ static ThreadQueue<string>& getCmdQueue(){
         static ThreadMap<string> logMap;
         return logMap;
     }
+
+   static atomic<bool>& getToFisinish(){
+      static atomic<bool> finishAll;
+      return finishAll;
+   }
 
 }
 
