@@ -4,13 +4,15 @@
 using namespace std;
 
 
-#include "plotter.h"
+#include "kernel.h"
+
+
 
 
 int main()
 {
-    Plotter plotter;
-    theadStart(&plotter);
+    Kernel kernel;
+    kernel.theadStart();
 
     return 0;
 }
