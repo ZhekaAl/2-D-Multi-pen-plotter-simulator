@@ -10,7 +10,7 @@
 using namespace std;
 
 template <typename T>
-class ThreadQueue
+class SynchroQueue
 {
 public:
     T pop()
@@ -45,7 +45,7 @@ private:
 
 
 template <typename T>
-class ThreadMap
+class SynchroMap
 {
 public:
     void insertNewKey(string key) {

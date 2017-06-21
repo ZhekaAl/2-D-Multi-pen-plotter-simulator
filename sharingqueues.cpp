@@ -3,15 +3,15 @@
 namespace SHARING_QUEUE
 {
 
-    ThreadQueue<string>& getCmdQueue()
+    SynchroQueue<string>& getCmdQueue()
     {
-      static ThreadQueue<string> cmdQueue;
+      static SynchroQueue<string> cmdQueue;
       return cmdQueue;
     }
 
-    ThreadMap<string>& getLogMap()
+    SynchroMap<string>& getLogMap()
     {
-      static ThreadMap<string> logMap;
+      static SynchroMap<string> logMap;
       return logMap;
     }
 

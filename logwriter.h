@@ -6,7 +6,7 @@
 #include <memory>
 
 
-#include "threadqueue.h"
+#include "synchrocontainer.h"
 #include "atomic"
 
 using namespace std;
@@ -26,7 +26,7 @@ class LogWriter
     void closeFileStreams();
 
     map<string, shared_ptr<ofstream> > filesMap;
-    ThreadMap<string>& logMap;
+    SynchroMap<string>& logMap;
     const atomic<bool>& fin;
 };
 

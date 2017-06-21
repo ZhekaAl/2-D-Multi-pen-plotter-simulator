@@ -42,7 +42,7 @@ TRAEKT::SpeedChange TRAEKT::nextSpeedChange(float Vc, float x0, float a, float x
         Vcm = -d + sqrt(pow(d,2)+8*d*(xT-x0));
         ostringstream ossLog;
         ossLog<<"nextSpeedChange Vc="<<Vc<<" a="<<a<<" dt="<<dt<<" xt-x0="<<xT-x0<<" xDown="<<xDown<<" Vcm="<<Vcm<<" res=(0+,1-,2=)"<<res<<endl;
-       ThreadMap<string>& mapLog = SHARING_QUEUE::getLogMap();
+       SynchroMap<string>& mapLog = SHARING_QUEUE::getLogMap();
        mapLog.push("base",ossLog.str()) ;
        // logMap.
     //------end

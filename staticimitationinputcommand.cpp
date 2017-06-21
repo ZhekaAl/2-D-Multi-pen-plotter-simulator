@@ -4,7 +4,7 @@
 
 void initScen()
 {
-    ThreadQueue<string> &cmdQueue  =  SHARING_QUEUE::getCmdQueue();
+    SynchroQueue<string> &cmdQueue  =  SHARING_QUEUE::getCmdQueue();
 
     string s = "create pen p1";
     cmdQueue.push(std::move(s));

@@ -63,7 +63,7 @@ void Plotter:: runThread()
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(dtSim*1000)));
 
-        ThreadQueue<string> &cmdQueue = SHARING_QUEUE::getCmdQueue();
+        SynchroQueue<string> &cmdQueue = SHARING_QUEUE::getCmdQueue();
 
         string str = cmdQueue.pop(); // no wait if empty
         while(!str.empty())

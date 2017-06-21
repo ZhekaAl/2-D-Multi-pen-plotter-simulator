@@ -10,7 +10,7 @@ public:
     CommandReader();
     void run();
 private:
-    ThreadQueue<string> &cmdQueue;
+    SynchroQueue<string> &cmdQueue;
     const atomic<bool>& fin;
 };
 

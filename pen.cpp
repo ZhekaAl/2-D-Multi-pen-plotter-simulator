@@ -23,12 +23,12 @@ string Pen::getLogString() const
     if(xM && draw)
         logOss<<xM->P<<";";
     else
-        logOss<<"0;";
+        logOss<<"-;";
 
     if(yM && draw)
             logOss<<yM->P;
         else
-            logOss<<"0";
+            logOss<<"-";
 
     logStr = logOss.str();
 

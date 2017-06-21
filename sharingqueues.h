@@ -2,14 +2,14 @@
 #define SHARINGQUEUES_H
 
 #include <atomic>
-#include "threadqueue.h"
+#include "synchrocontainer.h"
 
 
 namespace SHARING_QUEUE
 {
 
- ThreadQueue<string>& getCmdQueue();
- ThreadMap<string>& getLogMap();
+ SynchroQueue<string>& getCmdQueue();
+ SynchroMap<string>& getLogMap();
  atomic<bool>& getToFisinish();
 
 }

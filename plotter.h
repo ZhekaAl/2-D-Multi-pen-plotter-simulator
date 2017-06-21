@@ -7,7 +7,7 @@
 #include <map>
 #include <atomic>
 
-#include "threadqueue.h"
+#include "synchrocontainer.h"
 #include "motor.h"
 #include "pen.h"
 
@@ -38,7 +38,7 @@ private:
     float dtSim; //stepUpdateStates
     float dtLog; //stepToWriteLog
 
-    ThreadMap<string>& logMap; //reference! to shared data
+    SynchroMap<string>& logMap; //reference! to shared data
 
     condition_variable logThrWaitCond;// for wait adLog Thread, when state != SIMS
 

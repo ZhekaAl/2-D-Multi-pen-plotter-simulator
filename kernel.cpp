@@ -13,7 +13,7 @@ void Kernel::theadStart()
 
     fin = false;
 
-    initScen();// imit cmd input
+    //initScen();// imit cmd input
 
     thread commandReaderThread(&CommandReader::run, &commandReader);
     thread plotterRunThread(&Plotter::runThread,&plotter);

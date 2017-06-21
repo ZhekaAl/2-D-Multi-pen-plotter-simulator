@@ -20,7 +20,6 @@ SOURCES += main.cpp \
 
 HEADERS += \
     plotter.h \
-    threadqueue.h \
     logwriter.h \
     kernel.h \
     commandreader.h \
@@ -28,5 +27,6 @@ HEADERS += \
     staticimitationinputcommand.h \
     speedcalculate.h \
     motor.h \
-    pen.h
+    pen.h \
+    synchrocontainer.h
 
