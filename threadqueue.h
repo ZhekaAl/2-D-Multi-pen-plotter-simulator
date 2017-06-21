@@ -26,14 +26,12 @@ class ThreadQueue
   {
     std::unique_lock<std::mutex> mlock(mtx);
     que.push(item);
-    mlock.unlock();
   }
 
   void push(T&& item)
   {
     std::unique_lock<std::mutex> mlock(mtx);
     que.push(std::move(item));
-    mlock.unlock();
   }
 
  private:
@@ -78,11 +76,7 @@ public:
   const map<string,queue<T>>& getMapToRead()
   {
       std::unique_lock<std::mutex> mlock(mtx);
-      while (emptyQueues())
-            {
-              cond_.wait(mlock);
-            }
-      return mapTh;
+      cond_.wait(mlock,[this]{return !emptyQueues();});
   }
 
   T pop(string key)
