@@ -9,11 +9,8 @@ using namespace std;
 
 int main()
 {
-    cout << "Hello World!" << endl;
-
     Plotter plotter;
     theadStart(&plotter);
-    // theadStart();
 
     return 0;
 }
