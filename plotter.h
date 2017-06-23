@@ -21,7 +21,7 @@ class Plotter
 
 public:
 
-    Plotter();
+    explicit Plotter();
     void runThread();
     void addLogThread();
 
@@ -41,6 +41,9 @@ private:
     SynchroMap<string>& logMap; //reference! to shared data
 
     condition_variable logThrWaitCond;// for wait adLog Thread, when state != SIMS
+
+    Plotter& operator =(const Plotter&)=delete;
+    Plotter(const Plotter&) = delete;
 
 };
 

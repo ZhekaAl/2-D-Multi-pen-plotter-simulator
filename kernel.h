@@ -14,13 +14,17 @@
 class Kernel
 {
 public:
-    Kernel();
+    explicit Kernel();
     void theadStart();
  private:
     atomic<bool>& fin;
     Plotter plotter;
     LogWriter logWriter;
     CommandReader commandReader;
+
+
+    Kernel(const Kernel&) = delete;
+    Kernel& operator =(const Kernel&) = delete;
 };
 
 

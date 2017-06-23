@@ -7,17 +7,27 @@ class Motor
 {
 public:
 
-    Motor();
-
-    float S_max_aups;//max speed
-    float A_aupss;//fixed absolute value acceleration( > 0), in real process  acceleration can be -A_aupss,+A_aupss or 0
-    float A; //current acceleration
-    float TP;
-    float P;
-    float V;
-
+    explicit Motor();
+    float getCurrentPosition() const;
+    void setTargetPosition(float);
+    void setMaxSpeed(float);
+    void setMaxAcceleration(float);
     void step(float dt);
+
+private:
+
     void calculate(float dt);
+    float maxSpeed;//max speed
+    float maxAcceleration;//fixed absolute value acceleration( > 0), in real process  acceleration can be -A_aupss,+A_aupss or 0
+    float currentAcceleration; //current acceleration
+    float targetPosition;//target position
+    float currentPosition;//current position
+    float currentSpeed;//current speed
+
+    Motor&  operator=(const Motor& )= delete;
+
+
+
 };
 
 #endif // MOTOR_H

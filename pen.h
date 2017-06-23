@@ -10,7 +10,7 @@ using namespace std;
 class Pen
 {
 public:
-    Pen();
+    explicit Pen();
     void step(float dt);
     std::string getLogString() const;
 
@@ -24,6 +24,8 @@ private:
     Motor* xM;
     Motor* yM;
     bool draw;
+
+    Pen&  operator=(const Pen& )= delete;
 };
 
 #endif // PEN_H

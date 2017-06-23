@@ -172,13 +172,14 @@ void Plotter::processCmd(string str)
             float paramValue = stof(strParVal);
 
             if(motorParam == "S")
-                motorMap.at(motorName).S_max_aups = paramValue;
+               motorMap.at(motorName).setMaxSpeed(paramValue);
 
             else if(motorParam =="A")
-                motorMap.at(motorName).A_aupss = paramValue;
+               motorMap.at(motorName).setMaxAcceleration(paramValue);
 
             else if(motorParam =="P")
-                motorMap.at(motorName).TP = paramValue;
+               motorMap.at(motorName).setTargetPosition(paramValue);
+
             return;
         }
         if((v.at(1)=="pen" ) && v.size()==4)

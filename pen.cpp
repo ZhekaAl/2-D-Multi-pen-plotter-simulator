@@ -21,12 +21,12 @@ string Pen::getLogString() const
     ostringstream logOss;
 
     if(xM && draw)
-        logOss<<xM->P<<";";
+        logOss<<xM->getCurrentPosition()<<";";
     else
         logOss<<"-;";
 
     if(yM && draw)
-            logOss<<yM->P;
+            logOss<<yM->getCurrentPosition();
         else
             logOss<<"-";
 

@@ -3,11 +3,11 @@
 
 #include <fstream>
 #include <iostream>
-#include <memory>
+#include <atomic>
 
 
 #include "synchrocontainer.h"
-#include "atomic"
+
 
 using namespace std;
 
@@ -17,7 +17,7 @@ class LogWriter
 
    public:
 
-    LogWriter();
+    explicit LogWriter();
     void run();
 
    private:
@@ -28,6 +28,9 @@ class LogWriter
     map<string, shared_ptr<ofstream> > filesMap;
     SynchroMap<string>& logMap;
     const atomic<bool>& fin;
+
+    LogWriter(const LogWriter&) = delete;
+    LogWriter& operator =(const LogWriter&) = delete;
 };
 
 #endif // LOGWRITER_H
