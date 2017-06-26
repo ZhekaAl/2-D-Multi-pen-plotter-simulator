@@ -2,8 +2,11 @@
 #define PEN_H
 
 #include<string>
+#include <atomic>
+
 
 #include"motor.h"
+
 
 using namespace std;
 
@@ -17,15 +20,16 @@ public:
     void setMotorX(Motor* motPtr);
     void setMotorY(Motor* motPtr);
 
-    bool isDraw() const;
+  //  bool isDraw() const;
     void setDraw(bool draw_);
 
 private:
-    Motor* xM;
-    Motor* yM;
-    bool draw;
+    atomic<Motor*> xM;
+    atomic<Motor*> yM;
+    atomic_bool draw;
 
     Pen&  operator=(const Pen& )= delete;
+
 };
 
 #endif // PEN_H

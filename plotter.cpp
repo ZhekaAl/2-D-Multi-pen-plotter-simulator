@@ -42,15 +42,18 @@ void Plotter::addLogThread()
         unique_lock<mutex> mlock(mtx);
         logThrWaitCond.wait(mlock, lfunc);
 
-        for(pair<string,Pen> pair : penMap)
+
+        for(map<string, Pen>::const_iterator it = penMap.begin();
+            it != penMap.end(); ++it)
         {
-            string logStr = pair.second.getLogString();
+            string logStr = (*it).second.getLogString();
+            if(logStr.empty())
+                continue;
             ostringstream oss;
             oss << time<<";"<<logStr<<"\n";
-
-            logMap.push(pair.first, oss.str() );
+            logMap.push((*it).first, oss.str() );
         }
-    }
+   }
     cout<<"finish addLogTh";
 }
 
@@ -98,9 +101,7 @@ void Plotter::processCmd(string str)
     vector<string> v{istream_iterator<string>{iss},
                      istream_iterator<string>{}};
 
-
     str.append("\n");
-
 
     logMap.push("base",move(str));
 
@@ -122,11 +123,13 @@ void Plotter::processCmd(string str)
     {
         if(v.at(1)=="motor")
         {
-            motorMap.insert(pair<string, Motor >(v.at(2), Motor() ) );
+          //  motorMap.insert(pair<string, Motor >(v.at(2), move(Motor()) ) );
+           motorMap[v.at(2)];
         }
         if(v.at(1)=="pen")
         {
-            penMap.insert(pair<string, Pen >(v.at(2),Pen()));
+           // penMap.insert(pair<string, Pen >(v.at(2),Pen()));
+            penMap[v.at(2)];
             logMap.insertNewKey(v.at(2));
         }
         return;
@@ -199,9 +202,11 @@ void Plotter::processCmd(string str)
 
 void Plotter:: sims()
 {
-    for(pair<string,Pen> pair : penMap)
+    for(map<string, Pen>::iterator it = penMap.begin();
+        it != penMap.end(); ++it)
     {
-        pair.second.step(dtSim);
+       (*it).second.step(dtSim);
     }
+
     time += dtSim;
 }

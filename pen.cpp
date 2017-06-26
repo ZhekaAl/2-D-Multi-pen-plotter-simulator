@@ -10,9 +10,11 @@ Pen::Pen():xM(nullptr),yM(nullptr),draw(true)
 void Pen::step(float dt)
 {
     if(xM)
-     xM->step(dt);
+       xM.load()->step(dt);
+
     if(yM)
-     yM->step(dt);
+       yM.load()->step(dt);
+
 }
 
 string Pen::getLogString() const
@@ -20,15 +22,13 @@ string Pen::getLogString() const
     string logStr;
     ostringstream logOss;
 
-    if(xM && draw)
-        logOss<<xM->getCurrentPosition()<<";";
-    else
-        logOss<<"-;";
+    if(!draw) return "";
 
-    if(yM && draw)
-            logOss<<yM->getCurrentPosition();
-        else
-            logOss<<"-";
+    if(xM)
+        logOss<<xM.load()->getCurrentPosition()<<";";
+
+    if(yM )
+        logOss<<yM.load()->getCurrentPosition();
 
     logStr = logOss.str();
 
@@ -37,21 +37,23 @@ string Pen::getLogString() const
 
 void Pen::setMotorX(Motor* motPtr)
 {
+
     if(motPtr!= nullptr)
      xM = motPtr;
 }
 
 void Pen::setMotorY(Motor* motPtr)
 {
+
     if(motPtr!= nullptr)
      yM = motPtr;
 }
 
 
-bool Pen::isDraw() const
-{
-    return draw;
-}
+//bool Pen::isDraw() const
+//{
+//    return draw;
+//}
 
 void Pen::setDraw(bool draw_)
 {

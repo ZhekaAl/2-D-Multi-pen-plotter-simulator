@@ -3,6 +3,10 @@
 
 #include "speedcalculate.h"
 
+#include <mutex>
+
+
+
 class Motor
 {
 public:
@@ -26,7 +30,7 @@ private:
 
     Motor&  operator=(const Motor& )= delete;
 
-
+    mutable std::mutex m_mutex;
 
 };
 

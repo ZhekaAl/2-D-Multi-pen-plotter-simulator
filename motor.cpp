@@ -15,6 +15,7 @@ Motor::Motor():maxSpeed(1),
 
 void Motor::step(float dt)
 {
+    lock_guard<mutex> mlock(m_mutex);
     currentPosition += currentSpeed*dt;
 
     calculate(dt);//change A
@@ -46,21 +47,25 @@ void Motor::calculate(float dt)
 
 float Motor::getCurrentPosition() const
 {
+    lock_guard<mutex> mlock(m_mutex);
     return currentPosition;
 }
 
 void Motor::setTargetPosition(float _targetPosition)
 {
+     lock_guard<mutex> mlock(m_mutex);
      targetPosition = _targetPosition;
 }
 
 void Motor::setMaxSpeed(float _maxSpeed)
 {
+    lock_guard<mutex> mlock(m_mutex);
     maxSpeed = _maxSpeed;
 }
 
 void Motor::setMaxAcceleration(float _maxAcceleration)
 {
+    lock_guard<mutex> mlock(m_mutex);
     maxAcceleration = _maxAcceleration;
 }
 
